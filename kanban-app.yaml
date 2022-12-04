@@ -1,0 +1,391 @@
+openapi: 3.0.0
+info:
+  description: ""
+  version: 1.0.0
+  title: Kanban Board App
+  contact:
+    email: 21f1005287@student.onlinedegree.iitm.ac.in
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /list/{list_id}:
+    get:
+      tags:
+        - List
+      summary: Get details about a list with list_id
+      description: ""
+      operationId: getList
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/List"
+        "404":
+          description: List not Found
+    put:
+      tags:
+        - List
+      summary: Update a list
+      description: ""
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListIn"
+      responses:
+        "200":
+          description: success
+          content:   
+            application/json:
+              schema:
+                $ref: "#/components/schemas/List"
+        "404":
+          description: List not found
+    delete:
+      tags: 
+        - List
+      summary: delete a list
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: success
+        "404":
+          description: list not found
+  /{username}/list:
+    post:
+      tags:
+        - List
+      summary: Create a list
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListIn"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/List"
+    get:
+      tags:
+        - List
+      summary: Get all the lists owned by the user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/List"
+  /user:
+    post:
+      tags:
+        - User
+      summary: Create a User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserIn"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: User ID already exists
+  /user/{user_id}:
+    put:
+      tags:
+        - User
+      summary: Update a User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserIn"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User no found
+    get:
+      tags:
+        - User
+      summary: Get details of a User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+    delete:
+      tags:
+        - User
+      summary: Delete a User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+  /card/{card_id}:
+    get: 
+      tags:  
+        - Card
+      summary: Get the details of a card
+      parameters:
+        - in: path
+          name: card_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: success
+          content:
+            applcation/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+            description: Card Not Found
+    delete: 
+      tags:  
+        - Card
+      summary: Delete a card
+      parameters:
+        - in: path
+          name: card_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: success
+          content:
+            applcation/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+            description: Card Not Found
+    put: 
+      tags:  
+        - Card
+      summary: Get the details of a card
+      parameters:
+        - in: path
+          name: card_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardIn"
+      responses:
+        "200":
+          description: success
+          content:
+            applcation/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+            description: Card Not Found
+  /list/{list_id}/card:
+    get: 
+      tags:  
+        - Card
+      summary: Get the details of all the cards in a list with list_id
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: success
+          content:
+            applcation/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+            description: Card Not Found
+    post: 
+      tags:  
+        - Card
+      summary: Create a card for a particular list
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardIn"
+      responses:
+        "200":
+          description: success
+          content:
+            applcation/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+servers:
+  - url: http://127.0.0.1:5000/api
+components:
+  schemas:
+    List:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        desc:
+          type: string
+        created_on:
+          type: string
+          format: date-time
+    ListIn:
+      type: object
+      properties:
+        name:
+          type: string
+        desc:
+          type: string
+    CardIn:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        deadline:
+          type: string
+          format: date-time
+        done:
+          type: integer
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        created_date:
+          type: string
+          format: date-time
+        edited_date:
+          type: string
+          format: date-time
+        completed_date:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        done:
+          type: boolean
+    UserIn:
+      type: object
+      properties:
+        first_name: 
+          type: string
+        last_name:
+          type: string
+        user_id:
+          type: string
+        password: 
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        user_id:
+          type: string
+        created_on:
+          type: string
+          format: date-time
+        last_login:
+          type: string
+          format: date-time
+        

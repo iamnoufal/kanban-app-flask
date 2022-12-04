@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <!-- head begins -->
+  <head>
+    <!-- character set -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- title -->
+    <title>Kanban Board</title>
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+    <!-- bootstrap js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- bootstrap css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous" />
+
+    <!-- bootstrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
+
+    <!-- style sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <!-- end of head -->
+
+  <!-- body begins -->
+  <body>
+
+    <!-- nav -->
+    <nav class="navbar transparent navbar-expand bg-light fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-brand h4 mx-4 my-0">Kanban Board</div>
+      </div>
+      <ul class="navbar-nav fs-5">
+        <!-- summary -->
+        <a class="nav-item text-decoration-none text-black" href="summary"><i class="bi bi-graph-up-arrow"></i></a>
+        <!-- logout -->
+        <a class="nav-item mx-5 text-black" href="/logout"><i class="bi bi-box-arrow-right"></i></a>
+      </ul>
+    </nav>
+    <!-- nav ends -->
+
+    {% if lists | length != 0 %}
+
+    <!-- container -->
+    <div class="d-inline-flex p-3" style="grid-column-gap: 2vw; margin-top: 56px">
+
+      <!-- loop to render every list -->
+      {% for i in lists %}
+      
+      <!-- list container -->
+      <div style="width: 250px;">
+        {% set maskid = 'mask-'+i.id|string %}
+        <div class="card transparent" ondragover="event.preventDefault(); document.getElementById('{{maskid}}').classList.add('d-flex'); document.getElementById('{{maskid}}').classList.remove('d-none')" >
+
+          <!-- mask -->
+          <div 
+            class="position-absolute h-100 w-100 d-none display-1 justify-content-center align-items-center" 
+            style="background-color: rgba(0,0,0,0.2); z-index: 1" 
+            id="{{maskid}}"
+            ondrop="drop(event, '{{i.id}}', document.getElementById('list-{{i.id}}')); this.classList.remove('d-flex'); this.classList.add('d-none')" 
+            ondragover="event.preventDefault(); this.classList.add('d-flex'); this.classList.remove('d-none')" 
+            ondragleave="this.classList.add('d-none'); this.classList.remove('d-flex');"
+          >+</div>
+
+          <!-- list details -->
+          <div class="navbar bg-light">
+            <div class="container-fluid d-flex align-items-centesr m-1">
+              <div style="width:75%">
+                <!-- list name -->
+                <h5 class="m-0">{{ i.name }}</h5>
+                <!-- list descsription -->
+                <p class="text-muted m-0"><small>{{ i.desc }}</small></p>
+              </div>
+              <!-- add card button -->
+              <button type="button" class="btn border-0 fs-3 fw-bold p-0" style="border-radius:50%" data-toggle="modal" data-target="#{{ i.name+i.id|string }}"><i class="bi bi-plus p-0"></i></button>
+            </div>
+          </div>
+          <!-- end of list details -->
+
+          <!-- add card modal -->
+          <div class="modal fade" id="{{ i.name+i.id|string }}" tabindex="-1" role="dialog" aria-labelledby="createCardLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="createCardLabel">Create card</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form action="/list/{{ i.id }}/create" method="post">
+                  <div class="modal-body">
+                    <div class="form-group mt-3">
+                      <label for="name">Name:</label>
+                      <input type="text" class="form-control mt-2" id="name" name="name" required>
+                    </div>
+                    <div class="form-group mt-3">
+                      <label for="desc">Description:</label>
+                      <input type="text" class="form-control mt-2" id="desc" name="desc" required>
+                    </div>
+                    <div class="form-group mt-3">
+                      <label for="deadline">Deadline:</label>
+                      <input type="datetime-local" class="form-control mt-2" id="deadline" name="deadline" required>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <input type="submit" value="Create" class="btn btn-success" />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- end of add card modal -->
+
+          <!-- cards container -->
+
+          <div 
+            class="card-body p-0" 
+            style="max-height: 65vh; overflow-x:auto" 
+            id="list-{{i.id}}"
+          >
+
+            <!-- loop to render all the cards of a list -->
+            {% for j in i.cards %}
+            
+            <!-- card name and deadline -->
+            <div 
+              class="card w-auto m-3 btn text-start p-1{% if j.done %} border-success{% endif %}" 
+              id="task-{{ j.id }}" 
+              draggable="true" data-toggle="modal" 
+              data-target="#{{ j.name+j.id|string }}" 
+              ondragstart="event.dataTransfer.setData('id', event.target.id); event.dataTransfer.setData('card_id', '{{j.id}}')"
+            >
+              <div class="card-body">
+                <!-- card name -->
+                <h6 class="card-title fw-bold">{{ j.name }}</h6>
+                <!-- card deadline or completed tag (if the deadline passes, bg becomes red; else green) -->
+                {% if j.done %}
+                <i class="bi bi-check-circle-fill text-success" style="position:absolute;left:-5%;top:-5%;margin:0;font-size:1.3em;padding:0;line-height:0;"></i>
+                <p class="m-0">{{j.description}}</p>
+                {% else %}
+                <p class="badge m-0 {% if datetime.today()<datetime.strptime(j.deadline, '%Y-%m-%dT%H:%M') %} bg-success {% else %} bg-danger {% endif %}">{{ j.deadline|replace("T"," ") }}</p>
+                {% endif %}
+              </div>
+            </div>
+            <!-- end of card name and deadline -->
+
+            <!-- modal to display card data -->
+            <div class="modal fade" id="{{ j.name+j.id|string }}" tabindex="-1" role="dialog" aria-labelledby="viewCardLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="viewCardLabel">{{ j.name }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <table style="width:100%">
+                      <tr>
+                        <td><h6 class="m-auto">Description</h6 class="m-auto"></td>
+                        <td>{{ j.description }}</td>
+                      </tr>
+                      <tr>
+                        <td><h6 class="m-auto">Deadline</h6 class="m-auto"></td>
+                        <td>{{ j.deadline|replace("T"," ") }}</td>
+                      </tr>
+                      <tr>
+                        <td><h6 class="m-auto">Created on</h6 class="m-auto"></td>
+                        <td>{{ j.created_date|replace("T"," ") }}</td>
+                      </tr>
+                      {% if j.edited_date %}
+                      <td><h6 class="m-auto">Last edited on</h6 class="m-auto"></td>
+                        <td>{{ j.edited_date|replace("T"," ") }}</td>
+                      </tr>
+                      {% endif %}
+                      {% if j.done %}
+                      <td><h6 class="m-auto">Completed on</h6 class="m-auto"></td>
+                        <td>{{ j.completed_date|replace("T"," ") }}</td>
+                      </tr>
+                      {% endif %}
+                    </table>
+                  </div>
+                  <div class="modal-footer">
+                    <!-- delete card button -->
+                    <a type="button" class="btn btn-danger" href="/card/{{ j.id }}/delete"><i class="bi bi-trash3"></i></a>
+                    <!-- edit card button -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit{{j.name}}{{j.id}}"><i class="bi bi-pencil-square"></i></button>
+                    <!-- mark as completed button -->
+                    <a type="button" href="/card/{{ j.id }}/done" class="btn btn-{% if j.done %}secondary"><i class="bi bi-x-circle"> Mark as not done</i>{% else %}success"><i class="bi bi-check-circle"> Mark as done</i>{% endif %}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end of card data modal -->
+
+            <!-- modal to edit card -->
+            <div class="modal fade" id="edit{{j.name}}{{j.id}}" tabindex="-1" role="dialog" aria-labelledby="editCardLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editCardLabel">Editing "{{j.name}}" card</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form action="/card/{{ j.id }}/edit" method="post">
+                    <div class="modal-body">
+                      <div class="form-group mt-3">
+                        <label for="name">Name:</label>
+                        <input type="text" class="form-control mt-2" id="name" name="name" value="{{j.name}}" required>
+                      </div>
+                      <div class="form-group mt-3">
+                        <label for="desc">Description:</label>
+                        <input type="text" class="form-control mt-2" id="desc" name="desc" value="{{j.description}}" required>
+                      </div>
+                      <div class="form-group mt-3">
+                        <label for="deadline">Deadline:</label>
+                        <input type="datetime-local" class="form-control mt-2" id="deadline" name="deadline" value="{{j.deadline}}" required>
+                      </div>
+                      <div class="form-group mt-3">
+                        <label for="list">Deadline:</label>
+                        <select name="list" id="list" class="form-control mt-2">
+                          {% for k in lists %}<option {% if k.id==i.id %}selected{% endif %} value="{{k.id}}">{{ k.name }}</option>{% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <input type="submit" value="Save" class="btn btn-success" />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <!-- end of edit card modal -->
+            
+            {% endfor %}
+            <!-- end of for loop to render cards -->
+
+          </div>
+          <!-- end of cards container -->
+
+          <div class="card-footer bg-light d-flex justify-content-end">
+            <!-- edit list button -->
+            <div type="button" class="btn border-0" style="border-radius:50%" data-toggle="modal" data-target="#edit{{i.name}}{{i.id}}"><i class="bi bi-pencil-square"></i></div>
+            <!-- delete list button -->
+            <a class="btn text-decoration-none border-0" style="border-radius:50%" href="/list/{{ i.id }}/delete"><i class="bi bi-trash3"></i></a>
+          </div>
+
+          <!-- edit list modal -->
+          <div class="modal fade" id="edit{{i.name}}{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="editListLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="createListLabel">Editing "{{i.name}}" list</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form action="/list/{{i.id}}/edit" method="post">
+                  <div class="modal-body">
+                    <div class="form-group mt-3">
+                      <label for="name">Name:</label>
+                      <input type="text" class="form-control mt-2" id="name" name="name" value="{{i.name}}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                      <label for="desc">Description:</label>
+                      <input type="text" class="form-control mt-2" id="desc" name="desc" value="{{i.desc}}" required>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <input type="submit" value="Create" class="btn btn-success" />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- end of edit list modal -->
+
+        </div>
+      </div>
+      <!-- end of list container -->
+
+      {% endfor %}
+      <!-- end of for loop to render list -->
+
+      <!-- add list container -->
+      <div style="max-height: 100%; overflow-x: auto; width: auto;">
+        <div class="card">
+          <div class="card-body p-0">
+
+            <!-- add list button -->
+            <div type="button" class="navbar bg-light btn" data-toggle="modal" data-target="#createList">
+              <div class="container-fluid d-flex align-items-center">
+                <small class="fs-6 fw-700">Add another list</small>
+              </div>
+            </div>
+            <!-- end of add list button -->
+
+            <!-- modal to add list -->
+            <div class="modal fade" id="createList" tabindex="-1" role="dialog" aria-labelledby="createListLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="createListLabel">Create List</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form action="create" method="post">
+                    <div class="modal-body">
+                      <div class="form-group mt-3">
+                        <label for="name">Name:</label>
+                        <input type="text" class="form-control mt-2" id="name" name="name" required>
+                      </div>
+                      <div class="form-group mt-3">
+                        <label for="desc">Description:</label>
+                        <input type="text" class="form-control mt-2" id="desc" name="desc" required>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <input type="submit" value="Create" class="btn btn-success" />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <!-- end of add list modal -->
+
+          </div>
+        </div>
+      </div>
+      <!-- end of add list container -->
+
+      
+
+    </div>
+    <!-- end of container -->
+
+    {% else %}
+      
+    <div class="d-flex justify-content-center align-items-center" style="width: 100%; height: 100vh">
+      <div class="text-center">
+        <h3>Hello There!!</h3>
+        <h6>Let's Create your first list</h6>
+        <div type="button" class="mt-3 btn-primary btn text-center" data-toggle="modal" data-target="#createList">
+          <div class="container-fluid">
+            <span class="fs-6 fw-800 text-center">Add list</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- modal to add list -->
+      <div class="modal fade" id="createList" tabindex="-1" role="dialog" aria-labelledby="createListLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createListLabel">Create List</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="create" method="post">
+              <div class="modal-body">
+                <div class="form-group mt-3">
+                  <label for="name">Name:</label>
+                  <input type="text" class="form-control mt-2" id="name" name="name" required>
+                </div>
+                <div class="form-group mt-3">
+                  <label for="desc">Description:</label>
+                  <input type="text" class="form-control mt-2" id="desc" name="desc" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <input type="submit" value="Create" class="btn btn-success" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- end of add list modal -->
+
+    </div>
+
+    {% endif %}
+
+    <!-- javascript to drag and drop -->
+    <script>
+      const drop = (e, list_id, el) => {
+        e.preventDefault();
+        var cid = e.dataTransfer.getData("id");
+        var card_id = e.dataTransfer.getData("card_id");        
+        el.appendChild(document.getElementById(cid));
+        window.location.href="/card/"+card_id+"/change/"+list_id;
+      }
+    </script>
+
+  </body>
+  <!-- end of body -->
+
+</html>

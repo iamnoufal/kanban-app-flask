@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kanban Board</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+      .transparent {background: rgba(0,0,0,0);}
+      .dim-bg {background: rgba(255,255,255,0.3);}
+      @media screen and (max-width:768px) {.w-50 {width: 100%!important}}
+    </style>
+  </head>
+  <body>
+    <div class="d-flex align-items-center justify-content-center" style="height: 100vh">
+      <form class="card p-5 w-50 dim-bg" action="" method="POST">
+        <div class="text-center display-6 mb-4">Welcome to Kanban Board!</div>
+        <div class="d-md-flex">
+          <div class="mb-3 mx-3 col">
+            <label for="fname" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="fname" name="fname" required />
+          </div>
+          <div class="mb-3 mx-3 col">
+            <label for="lname" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lname" name="lname" required />
+          </div>
+        </div>
+        <div class="mb-3 mx-3">
+          <label for="user_id" class="form-label">User Name</label>
+          <input type="text" class="form-control" id="user_id" name="user_id" />
+        </div>
+        <div class="mb-3 mx-3">
+          <label for="pwd" class="form-label">Password</label>
+          <input type="password" class="form-control" id="pwd" name="pwd" />
+        </div>
+        <div class="text-danger mb-3 mx-3">{{msg}}</div>
+        <a href="/auth/login" class="text-muted mb-3 mx-3">Already have an account? Log in here</a>
+        <button type="submit" class="btn btn-primary mx-3">Sign me up</button>
+      </form>
+    </div>
+  </body>
+</html>

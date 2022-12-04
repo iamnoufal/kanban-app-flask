@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+    <!-- bootstrap js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- boostrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- bootstrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+
+  <body>
+    
+    <!-- nav -->
+    <nav class="navbar transparent navbar-expand-lg bg-light fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-brand h4 mx-4 my-0">Kanban Board</div>
+      </div>
+      <ul class="navbar-nav fs-5">
+        <!-- lists -->
+        <a class="nav-item text-black" href="lists"><i class="bi bi-card-checklist"></i></a>
+        <!-- logout -->
+        <a class="nav-item mx-5 text-black" href="/logout"><i class="bi bi-box-arrow-right"></i></a>
+      </ul>
+    </nav>
+    <!-- nav ends -->
+
+    <!-- summary content starts here -->
+    <div style="padding-top: 50px; height: 100vh;" class="d-flex">
+
+      <!-- user summary -->
+      <div class="col-6 p-3">
+        <div class="card d-flex w-100 h-100 transparent justify-content-center align-items-center overflow-auto">
+          <h4 class="text-center mb-4">User Summary</h4>
+          <table>
+            <tr>
+              <td><h6 class="mx-3 my-auto">Name</h6></td>
+              <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+              <td><h6 class="mx-3 my-auto">User ID</h6></td>
+              <td>{{ user.user_id }}</td>
+            </tr>
+            <tr>
+              <td><h6 class="mx-3 my-auto">Account created on</h6></td>
+              <td>{{ user.created_on[:16]|replace("T"," ") }}</td>
+            </tr>
+            <tr>
+              <td><h6 class="mx-3 my-auto">Last Login</h6></td>
+              <td>{{ user.last_login[:16]|replace("T"," ") }}</td>
+            </tr>
+          </table>
+          <img src="{{ url_for('static', filename=user.user_id+'_summary.png') }}" alt="user summary" width="70%" />
+        </div>
+      </div>
+
+      <!-- list summary -->
+      <div class="col-6 p-3 ps-0">
+        <div class="card p-3 d-flex transparent overflow-auto" style="min-height:100%;max-height:100%">
+          <h4 class="mb-4 text-center">Lists Summary</h4>
+          <!-- <p class=""text-center>{{user.name}} has created {{lists|length}} lists</p> -->
+          {% for i in lists %}
+          <div class="card transparent w-100 mb-3">
+            <div class="card-header">
+              <h5>{{i.name}}</h5>
+              <p class="text-muted mb-0">{{i.desc}}</p>
+            </div>
+            <div class="card-body">
+              <table class="m-auto">
+                <tr>
+                  <td><h6 class="mx-3 my-auto">List created on</h6></td>
+                  <td class="text-end">{{ i.created_on }}</td>
+                </tr>
+                <tr>
+                  <td><h6 class="mx-3 my-auto">Total number of tasks in this list</h6></td>
+                  <td class="text-end">{{ i.total }}</td>
+                </tr>
+                <tr>
+                  <td><h6 class="mx-3 my-auto">Number of completed tasks</h6></td>
+                  <td class="text-end">{{ i.completed }}</td>
+                </tr>
+                <tr>
+                  <td><h6 class="mx-3 my-auto">Number of pending tasks</h6></td>
+                  <td class="text-end">{{ i.pending }}</td>
+                </tr>
+                <tr>
+                  <td><h6 class="mx-3 my-auto">Number of pending tasks that passed deadline</h6></td>
+                  <td class="text-end">{{ i.passed }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- end of list summary -->
+
+    </div>
+    <!-- summary content ends here -->
+
+  </body>
+</html>
