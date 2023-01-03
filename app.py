@@ -25,7 +25,7 @@ from apis.card import *
 
 api.add_resource(ListAPI, "/api/list", "/api/list/<int:list_id>")
 api.add_resource(UserListAPI, "/api/<user_id>/list")
-api.add_resource(UserAPI, "/api/user", "/api/user/<user_id>")
+api.add_resource(UserAPI, "/api/user", "/api/user/<user_id>/<pwd>")
 api.add_resource(CardAPI, "/api/card", "/api/card/<int:card_id>")
 api.add_resource(ListCardAPI, "/api/list/<int:list_id>/card")
 

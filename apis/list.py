@@ -14,11 +14,23 @@ ipFields = reqparse.RequestParser()
 ipFields.add_argument("name")
 ipFields.add_argument("desc")
 
+cardOpFields = {
+  "id": fields.Integer,
+  "name": fields.String,
+  "description": fields.String,
+  "created_date": fields.String,
+  "edited_date": fields.String,
+  "completed_date": fields.String,
+  "deadline": fields.String,
+  "done": fields.String
+}
+
 opFields = {
   "id": fields.Integer,
   "name": fields.String,
   "desc": fields.String,
-  "created_on": fields.String
+  "created_on": fields.String,
+  "cards": fields.List(fields.Nested(cardOpFields))
 }
 
 class ListAPI(Resource):
@@ -63,11 +75,19 @@ class UserListAPI(Resource):
   @marshal_with(opFields)
   def get(self, user_id):
     try:
-      list = User.query.filter_by(user_id = user_id).one().lists
+      lists = User.query.filter_by(user_id = user_id).one().lists
+      for i in lists:
+        cards = []
+        completedCards = []
+        for j in i.cards:
+          card = Card.query.filter_by(id=j.id).one()
+          cards.append(card) if not j.done else completedCards.append(card)
+        cards+=completedCards
+        i.cards = cards
     except exc.NoResultFound:
       raise NotFoundError(code = 404, emsg = "Lists for this User Not Found")
     else:
-      return list
+      return lists
   @marshal_with(opFields)
   def post(self, user_id):
     args = ipFields.parse_args()
