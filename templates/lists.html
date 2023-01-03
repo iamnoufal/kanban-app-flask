@@ -136,7 +136,7 @@
               class="card w-auto m-3 btn text-start p-1{% if j.done %} border-success{% endif %}" 
               id="task-{{ j.id }}" 
               draggable="true" data-toggle="modal" 
-              data-target="#{{ j.name+j.id|string }}" 
+              data-target="#{{ j.name }}{{ j.id|string }}" 
               ondragstart="event.dataTransfer.setData('id', event.target.id); event.dataTransfer.setData('card_id', '{{j.id}}')"
             >
               <div class="card-body">
