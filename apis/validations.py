@@ -7,12 +7,8 @@ class NotFoundError(HTTPException):
     self.response = make_response(emsg, code)
 
 class ValidationError(HTTPException):
-  def __init__(self, code, ecode, emsg):
-    data = {
-      "error_code": ecode,
-      "error_message": emsg
-    }
-    self.response = make_response(json.dumps(data), code)
+  def __init__(self, code, emsg):
+    self.response = make_response(emsg, code)
 
 class DuplicateError(HTTPException):
   def __init__(self, code, emsg):

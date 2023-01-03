@@ -22,7 +22,7 @@ opFields = {
   "name": fields.String,
   "user_id": fields.String,
   "created_on": fields.String,
-  "last_login": fields.String
+  "last_login": fields.String,
 }
 
 class UserAPI(Resource):
@@ -45,16 +45,18 @@ class UserAPI(Resource):
       return user
 
   @marshal_with(opFields)  
-  def get(self, user_id):
+  def get(self, user_id, pwd):
     try:
       user = User.query.filter_by(user_id = user_id).one()
+      if user.pwd != pwd:
+        raise ValidationError(code = 401, emsg = "Authentication failed")
     except exc.NoResultFound:
       raise NotFoundError(code = 404, emsg = "User Not Found")
     else:
       return user
 
   @marshal_with(opFields)
-  def put(self, user_id):
+  def put(self, user_id, pwd):
     args = ipFields.parse_args()
     try:
       user = User.query.filter_by(user_id = user_id).one()
@@ -68,7 +70,7 @@ class UserAPI(Resource):
     else:
       return user
 
-  def delete(self, user_id):
+  def delete(self, user_id, pwd):
     try:
       user = User.query.filter_by(user_id = user_id).one()
       for i in user.lists:
