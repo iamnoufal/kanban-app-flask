@@ -3,12 +3,44 @@ from application.db import db
 from application.models import *
 from .validations import *
 from sqlalchemy import exc
+from matplotlib import pyplot as plt
+from datetime import datetime
+
+userOpFields = {
+  "id": fields.Integer,
+  "name": fields.String,
+  "user_id": fields.String,
+  "created_on": fields.String,
+  "last_login": fields.String,
+}
+
+cardOpFields = {
+  "id": fields.Integer,
+  "name": fields.String,
+  "description": fields.String,
+  "created_date": fields.String,
+  "edited_date": fields.String,
+  "completed_date": fields.String,
+  "deadline": fields.String,
+  "done": fields.String
+}
+
+listOpFields = {
+  "id": fields.Integer,
+  "name": fields.String,
+  "desc": fields.String,
+  "created_on": fields.String,
+  "cards": fields.List(fields.Nested(cardOpFields))
+}
 
 opFields = {
-  "graph": fields.String
+  "graph1": fields.String,
+  "user": fields.Nested(userOpFields),
+  "lists": fields.Nested(listOpFields)
 }
 
 class SummaryAPI(Resource):
+  @marshal_with(opFields)
   def get(self, user_id):
     user = db.session.query(User).filter(User.user_id == user_id).one()
     lists = user.lists
@@ -40,4 +72,9 @@ class SummaryAPI(Resource):
     axe.legend(["Completed Tasks", "Pending Tasks"])
     fig.savefig("static/"+user_id+"_summary.png", transparent=True)
     plt.close(fig)
-    return user, lists, "http://127.0.0.1:5000/static/"+user_id+"_summary.png"
+    res = {
+      "graph1": "http://127.0.0.1:5000/static/"+user_id+"_summary.png",
+      "user": user,
+      "lists": lists
+    }
+    return res
