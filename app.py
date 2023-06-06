@@ -7,7 +7,7 @@ from flask_cors import CORS
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(current_dir, "db.sqlite3") 
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(current_dir, ".db/db.sqlite3") 
 app.secret_key = "secretkeyforapp"
 db.init_app(app)
 api = Api(app)
